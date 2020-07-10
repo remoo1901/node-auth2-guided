@@ -1,6 +1,7 @@
 const express = require("express")
 const bcrypt = require("bcryptjs")
 const Users = require("./users-model")
+const jwt = require("jsonwebtoken")
 const restrict = require("../middleware/restrict")
 
 const router = express.Router()
@@ -58,10 +59,18 @@ router.post("/login", async (req, res, next) => {
 
 		// generate a new session for this user,
 		// and sends back a session ID
-		req.session.user = user
+		//req.session.user = user
 
+		  const payload = {
+			  userId: user.id,
+			  username: user.username,
+			  userRole: "normal",
+		  } 
+		 
+         res.cookie("token", jwt.sign(payload, process.env.JWT_SECRET))
 		res.json({
 			message: `Welcome ${user.username}!`,
+			
 		})
 	} catch(err) {
 		next(err)
